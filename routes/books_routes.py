@@ -1,5 +1,5 @@
 
-from flask import Blueprint, request
+from flask import Blueprint
 from controllers.books_controller import (
     create_book,
     get_all_books,
@@ -13,7 +13,7 @@ books_routes = Blueprint('books_routes', __name__)
 
 @books_routes.route('/book', methods=['POST'])
 def create():
-    return create_book(request.json)
+    return create_book()
 
 @books_routes.route('/books', methods=['GET'])
 def get_all():
@@ -29,7 +29,7 @@ def get_by_id(book_id):
 
 @books_routes.route('/book/<book_id>', methods=['PUT'])
 def update(book_id):
-    return update_book(book_id, request.json)
+    return update_book(book_id)
 
 @books_routes.route('/book/delete/<book_id>', methods=['DELETE'])
 def delete(book_id):

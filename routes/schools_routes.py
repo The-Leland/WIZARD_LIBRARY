@@ -1,6 +1,6 @@
 
 
-from flask import Blueprint, request
+from flask import Blueprint
 from controllers.schools_controller import (
     create_school,
     get_all_schools,
@@ -13,7 +13,7 @@ schools_routes = Blueprint('schools_routes', __name__)
 
 @schools_routes.route('/school', methods=['POST'])
 def create():
-    return create_school(request.json)
+    return create_school()
 
 @schools_routes.route('/schools', methods=['GET'])
 def get_all():
@@ -25,7 +25,7 @@ def get_by_id(school_id):
 
 @schools_routes.route('/school/<school_id>', methods=['PUT'])
 def update(school_id):
-    return update_school(school_id, request.json)
+    return update_school(school_id)
 
 @schools_routes.route('/school/delete/<school_id>', methods=['DELETE'])
 def delete(school_id):

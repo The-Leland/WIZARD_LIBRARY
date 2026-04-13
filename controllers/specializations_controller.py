@@ -1,28 +1,34 @@
 
 
-from flask import jsonify
+from flask import request, jsonify
 from models.wizard_specialization import WizardSpecialization
 from db import db
 from datetime import datetime
 
-def create_specialization_entry(data):
+
+def create_specialization_entry():
+    post_data = request.form if request.form else request.get_json()
+
     try:
         specialization = WizardSpecialization(
-            wizard_id=data['wizard_id'],
-            spell_id=data['spell_id'],
-            proficiency_level=data.get('proficiency_level'),
-            date_learned=datetime.strptime(data['date_learned'], "%Y-%m-%d")
+            wizard_id=post_data['wizard_id'],
+            spell_id=post_data['spell_id'],
+            proficiency_level=post_data.get('proficiency_level'),
+            date_learned=datetime.strptime(post_data['date_learned'], "%Y-%m-%d")
         )
+
         db.session.add(specialization)
         db.session.commit()
+
         return jsonify(message="Specialization created successfully"), 201
+
     except Exception as e:
         return jsonify(error=str(e)), 400
-    
 
 
 def get_spells_for_wizard(wizard_id):
     specializations = WizardSpecialization.query.filter_by(wizard_id=wizard_id).all()
+
     return jsonify([
         {
             "spell_id": str(s.spell_id),
@@ -35,6 +41,7 @@ def get_spells_for_wizard(wizard_id):
 
 def get_wizards_for_spell(spell_id):
     specializations = WizardSpecialization.query.filter_by(spell_id=spell_id).all()
+
     return jsonify([
         {
             "wizard_id": str(s.wizard_id),
@@ -45,16 +52,19 @@ def get_wizards_for_spell(spell_id):
     ]), 200
 
 
-def update_specialization(wizard_id, spell_id, data):
+def update_specialization(wizard_id, spell_id):
+    post_data = request.form if request.form else request.get_json()
+
     specialization = WizardSpecialization.query.get((wizard_id, spell_id))
     if not specialization:
         return jsonify(error="Specialization not found"), 404
 
-    for key, value in data.items():
+    for key, value in post_data.items():
         setattr(specialization, key, value)
 
     db.session.commit()
     return jsonify(message="Specialization updated successfully"), 200
+
 
 def delete_specialization(wizard_id, spell_id):
     specialization = WizardSpecialization.query.get((wizard_id, spell_id))
@@ -63,10 +73,13 @@ def delete_specialization(wizard_id, spell_id):
 
     db.session.delete(specialization)
     db.session.commit()
+
     return jsonify(message="Specialization deleted successfully"), 200
-    
+
+
 def get_all_specializations():
     specializations = WizardSpecialization.query.all()
+
     return jsonify([
         {
             "wizard_id": str(s.wizard_id),

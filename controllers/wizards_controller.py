@@ -1,22 +1,28 @@
 
 
-from flask import jsonify
+from flask import request, jsonify
 from models.wizard import Wizard
 from db import db
 
-def create_wizard(data):
+
+def create_wizard():
+    post_data = request.form if request.form else request.get_json()
+
     try:
         wizard = Wizard(
-            school_id=data['school_id'],
-            wizard_name=data['wizard_name'],
-            house=data.get('house'),
-            year_enrolled=data.get('year_enrolled'),
-            magical_power_level=data.get('magical_power_level'),
-            active=data.get('active', True)
+            school_id=post_data['school_id'],
+            wizard_name=post_data['wizard_name'],
+            house=post_data.get('house'),
+            year_enrolled=post_data.get('year_enrolled'),
+            magical_power_level=post_data.get('magical_power_level'),
+            active=post_data.get('active', True)
         )
+
         db.session.add(wizard)
         db.session.commit()
+
         return jsonify(message="Wizard created successfully", wizard_id=str(wizard.wizard_id)), 201
+
     except Exception as e:
         return jsonify(error=str(e)), 400
 
@@ -86,12 +92,14 @@ def get_wizard_by_id(wizard_id):
     }), 200
 
 
-def update_wizard(wizard_id, data):
+def update_wizard(wizard_id):
+    post_data = request.form if request.form else request.get_json()
+
     wizard = Wizard.query.get(wizard_id)
     if not wizard:
         return jsonify(error="Wizard not found"), 404
 
-    for key, value in data.items():
+    for key, value in post_data.items():
         setattr(wizard, key, value)
 
     db.session.commit()
@@ -105,5 +113,5 @@ def delete_wizard(wizard_id):
 
     db.session.delete(wizard)
     db.session.commit()
-    return jsonify(message="Wizard deleted successfully"), 200
 
+    return jsonify(message="Wizard deleted successfully"), 200

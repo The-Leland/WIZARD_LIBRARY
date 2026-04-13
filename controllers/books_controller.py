@@ -1,21 +1,27 @@
-from flask import jsonify
+from flask import request, jsonify
 from models.book import Book
 from db import db
 
-def create_book(data):
+
+def create_book():
+    post_data = request.form if request.form else request.get_json()
+
     try:
         book = Book(
-            school_id=data['school_id'],
-            title=data['title'],
-            author=data.get('author'),
-            subject=data.get('subject'),
-            rarity_level=data.get('rarity_level'),
-            magical_properties=data.get('magical_properties'),
-            available=data.get('available', True)
+            school_id=post_data['school_id'],
+            title=post_data['title'],
+            author=post_data.get('author'),
+            subject=post_data.get('subject'),
+            rarity_level=post_data.get('rarity_level'),
+            magical_properties=post_data.get('magical_properties'),
+            available=post_data.get('available', True)
         )
+
         db.session.add(book)
         db.session.commit()
+
         return jsonify(message="Book created successfully", book_id=str(book.book_id)), 201
+
     except Exception as e:
         return jsonify(error=str(e)), 400
 
@@ -48,6 +54,7 @@ def get_available_books():
         for b in books
     ]), 200
 
+
 def get_book_by_id(book_id):
     book = Book.query.get(book_id)
     if not book:
@@ -65,12 +72,14 @@ def get_book_by_id(book_id):
     }), 200
 
 
-def update_book(book_id, data):
+def update_book(book_id):
+    post_data = request.form if request.form else request.get_json()
+
     book = Book.query.get(book_id)
     if not book:
         return jsonify(error="Book not found"), 404
 
-    for key, value in data.items():
+    for key, value in post_data.items():
         setattr(book, key, value)
 
     db.session.commit()
@@ -84,4 +93,5 @@ def delete_book(book_id):
 
     db.session.delete(book)
     db.session.commit()
+
     return jsonify(message="Book deleted successfully"), 200

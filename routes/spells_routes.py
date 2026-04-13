@@ -1,7 +1,7 @@
 
 
 
-from flask import Blueprint, request
+from flask import Blueprint
 from controllers.spells_controller import (
     create_spell,
     get_all_spells,
@@ -15,7 +15,7 @@ spells_routes = Blueprint('spells_routes', __name__)
 
 @spells_routes.route('/spell', methods=['POST'])
 def create():
-    return create_spell(request.json)
+    return create_spell()
 
 @spells_routes.route('/spells', methods=['GET'])
 def get_all():
@@ -31,7 +31,7 @@ def get_by_id(spell_id):
 
 @spells_routes.route('/spell/<spell_id>', methods=['PUT'])
 def update(spell_id):
-    return update_spell(spell_id, request.json)
+    return update_spell(spell_id)
 
 @spells_routes.route('/spell/delete/<spell_id>', methods=['DELETE'])
 def delete(spell_id):

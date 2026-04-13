@@ -1,6 +1,6 @@
 
 
-from flask import Blueprint, request
+from flask import Blueprint
 from controllers.specializations_controller import (
     create_specialization_entry,
     get_spells_for_wizard,
@@ -14,7 +14,7 @@ specializations_routes = Blueprint('specializations_routes', __name__)
 
 @specializations_routes.route('/wizard/specialize', methods=['POST'])
 def create_specialization():
-    return create_specialization_entry(request.json)
+    return create_specialization_entry()
 
 @specializations_routes.route('/specializations', methods=['GET'])
 def get_all():
@@ -30,7 +30,7 @@ def get_spell_wizards(spell_id):
 
 @specializations_routes.route('/wizard/<wizard_id>/spell/<spell_id>', methods=['PUT'])
 def update_specialization_route(wizard_id, spell_id):
-    return update_specialization(wizard_id, spell_id, request.json)
+    return update_specialization(wizard_id, spell_id)
 
 @specializations_routes.route('/wizard/<wizard_id>/spell/<spell_id>', methods=['DELETE'])
 def delete_specialization_route(wizard_id, spell_id):
